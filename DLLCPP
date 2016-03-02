@@ -1,0 +1,396 @@
+#include "DoublyLinkedList.hpp"
+#include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+DoublyLinkedList::Node::Node(DataType data)
+{
+	value = data;
+	next = NULL;
+	prev = NULL;
+}
+
+DoublyLinkedList::DoublyLinkedList()
+{
+	head_= NULL;
+	tail_= NULL;
+	size_ = 0;
+}
+
+DoublyLinkedList::~DoublyLinkedList()
+{
+
+	while (head_ != NULL)
+	{
+		remove_front();
+	}	
+	head_ = NULL;
+	tail_ = NULL;
+	size_ = 0;
+}
+
+bool DoublyLinkedList::empty() const
+{
+	if (size_ == 0) return true;
+	else return false;
+}
+
+unsigned int DoublyLinkedList::size() const
+{
+	return size_;
+}
+
+void DoublyLinkedList::print() const
+{
+	//>0 Nodes
+	if (head_ != NULL)
+	{	
+		Node* temp;
+		temp = head_;
+		cout << (temp->value)<< ",  ";
+		while (temp-> next != NULL)
+		{
+			temp = temp->next;
+			cout << (temp->value)<< "  " ;
+		}
+
+	}
+	else
+	//No Nodes
+	{
+		cout << "List is empty.";
+	}
+	cout <<"\n";
+}
+
+bool DoublyLinkedList::insert_front(DataType value)
+{
+	if(size_ == CAPACITY) return false;
+	Node* newFront = new Node(value);
+	newFront->next = NULL;
+	newFront->prev = NULL;
+	//No Nodes
+	if (head_ == NULL)
+	{
+		head_= newFront;
+		tail_= head_;
+		size_ = size_ + 1;
+		return true;
+	}
+	//1 or more Nodes
+	else
+	{
+		newFront->next = head_;
+		head_->prev = newFront;
+		head_= newFront;
+		size_ = size_ + 1;
+		return true;
+	}
+}
+
+bool DoublyLinkedList::remove_front()
+{
+	//No Nodes
+	if (size_ == 0) return false;
+	//1 Node
+	if (size_ == 1)
+	{
+		delete head_;
+		head_ = NULL;
+		tail_ = NULL;
+		size_ = size_ - 1;
+		return true;
+	}
+	//>1 Node
+	else
+	{
+		Node* temp;
+		temp = head_->next;
+		delete head_;
+		head_ = temp;
+		temp->prev = NULL;
+		size_ = size_ - 1;
+		return true;
+	}
+}
+
+bool DoublyLinkedList::insert_back(DataType value)
+{
+	if(size_ == CAPACITY) return false;
+	Node* newBack = new Node(value);
+	newBack->next = NULL;
+	newBack->prev = NULL;
+	//No Nodes
+	if (head_ == NULL)
+	{
+		head_ = newBack;
+		tail_ = newBack;
+		size_ = size_ + 1;
+		return true;
+	}
+	//>1 Nodes
+	else {	
+		Node* temp;
+		temp = tail_;
+		tail_-> next = newBack;
+		tail_ = newBack;
+		newBack->next = NULL;
+		tail_ -> prev = temp;
+		size_ = size_ + 1;
+		return true;
+	}
+}
+
+bool DoublyLinkedList::remove_back()
+{
+	//No Nodes
+	if (head_ == NULL)
+	{
+		return false;
+	}
+	//1 Node
+	if (head_->next == NULL)
+	{
+		delete head_;
+		head_= NULL;
+		tail_ = NULL;
+		size_ = size_ - 1;
+		return true;
+	}
+	//>1 Node
+		Node* temp;
+		temp = tail_ -> prev;
+		delete tail_;
+		tail_ = temp;
+		tail_ -> next = NULL;
+		size_ = size_ - 1;
+		return true;
+}
+
+bool DoublyLinkedList::insert(DataType value, unsigned int index)
+{
+	//this method will make the new node's index in the linked list the target index that was passed to it
+	//No Nodes
+	
+	if (head_== NULL)
+	{
+		if (index == 0)
+		{
+			Node* newNode = new Node(value);
+			head_ = newNode;
+			tail_ = head_;
+			size_ = size_ + 1;
+			return true;
+		}
+		else return false;
+	}
+	//the same process is true whether there is 1 or more Nodes if the given index is 0
+	else if (index == 0)
+	{
+		Node* newNode = new Node(value);
+		newNode->next = head_;
+		head_->prev = newNode;
+		head_ = newNode;
+		return true;
+	}
+	
+	if(size_ == CAPACITY) return false;
+
+	int matchIndex = 0;
+	Node* temp;
+	Node* temp2;
+	temp2 = NULL;
+	temp = head_;
+	
+	while (temp->next != NULL)
+	{
+		if (matchIndex+1 == index)
+		{
+			Node* newNode = new Node(value);
+			temp2 = temp->next;
+			temp->next = newNode;
+			newNode->prev = temp;
+			newNode->next = temp2;
+			temp2->prev = newNode;
+			size_ = size_ + 1;
+			return true;
+		}
+		temp= temp->next;
+		matchIndex= matchIndex + 1;
+	}
+	return false;
+	//the above loop doesn't insert when the index given is equal to the size of the list (inserting at the end), so here's a case for it//if the index does not exist withtin the list
+}
+
+bool DoublyLinkedList::remove(unsigned int index)
+{
+	//No Nodes
+	if (size_ == 0) return false;
+	if (index > size_ - 1) return false;
+	//1 Node
+	if (head_->next == NULL)
+	{
+		if (index != 0) return false;
+		else remove_front();
+	}
+	//count the number of elements in the list; if the index is greater than this then we cannot remove the node
+
+	if (index > size_ - 1) return false;
+	//while we are at it, we will make a case for if the index is the last element in the list
+	if (index == size_ -1) remove_back();
+	
+	Node* temp;
+	temp = head_;
+	Node* temp2;
+	temp2= NULL;
+	int count =0;
+	while (temp->next->next != NULL)
+	{
+		if (count + 1 == index)
+		{
+			temp2 = temp->next->next;
+			delete temp->next;
+			temp->next = temp2;
+			temp2->prev = temp;
+			size_ = size_ - 1;
+			return true;
+		}
+		temp= temp->next;
+		count= count +1;
+	}
+	return false;
+}
+
+unsigned int DoublyLinkedList::search(DataType value) const
+{
+	
+	//No Nodes
+	if (head_ == NULL) return 0;
+	
+	//>0 Nodes
+	int count = 0;
+	Node* temp;
+	temp = head_;
+	while (temp->next != NULL)
+	{
+
+		if (temp->value == value) 
+		{
+
+		return count;
+		}
+		
+		temp= temp->next;
+		count= count +1;
+	}
+	return size_;
+}
+
+DoublyLinkedList::DataType DoublyLinkedList::select(unsigned int index) const
+{
+	//No Nodes, 1 Node, or index is greater than list size
+	if (index > size_ -1 || size_ == 1) return tail_->value;
+	if (size_== 0) return -1;
+	//>1Nodes
+	int count = 0;
+	Node* tempy;
+	tempy = head_;
+	while (tempy->next != NULL)
+	{
+	
+		if (count == index) 
+		{
+	
+			return tempy->value;
+		}
+		
+		tempy= tempy->next;
+		count= count + 1;
+	}
+	return tail_->value;
+}
+
+bool DoublyLinkedList::replace(unsigned int index, DataType value)
+{
+	//No Nodes
+	if (head_ == NULL) return false;
+	if (index > size_-1) return false;	
+	//1 Node
+	if (head_->next == NULL)
+	{
+			Node* newNode = new Node(value);
+			delete head_;
+			head_ = newNode;
+			tail_ = newNode;
+			return true;
+	}
+	//count the number of elements in the list; if the index is greater than this then we cannot replace the node
+
+
+	//from this point forth, it will always be possible to replace a node, so let's go ahead_ and define the new node
+	Node* newNode = new Node(value);
+	//while we are at it, we will make a case for if the index is the last element in the list
+	if (index == size_-1)
+	{
+		remove_back();
+		insert_back(value);
+	}
+
+	if (index = 0)
+	{
+		remove_front();
+		insert_front(value);
+	}
+	
+	Node* temp;
+	temp = head_;
+	Node* temp2;
+	temp2= NULL;
+	int count =0;
+	while (temp->next->next != NULL)
+	{
+		if (count + 1 == index)
+		{
+			temp2 = temp->next->next;
+			delete temp->next;
+			temp->next = newNode;
+			newNode->prev = temp;
+			temp2->prev = newNode;
+			newNode->next = temp2;
+			return true;
+		}
+		temp= temp->next;
+		count= count +1;
+	}
+	return false;
+}
+
+DoublyLinkedList::Node* DoublyLinkedList::getNode(unsigned int index) const
+{
+	//No Nodes
+	if (head_== NULL) return NULL;
+	if (index > size_-1) return NULL;
+	if (index == size_-1) return tail_;
+	if (index == 0) return head_;
+	//1 Node
+	if (head_->next == NULL) return head_;
+	//>1Nodes
+	int matchIndex =0;
+	Node* temp;
+	temp = head_;
+	while (temp->next != NULL)
+	{
+		temp= temp->next;
+		matchIndex= matchIndex + 1;
+		if (matchIndex == index) return temp;
+	}
+	return NULL;
+}
+bool DoublyLinkedList::full() const
+{
+	if (size_ <= 65536) return false;
+	else return true;
+}
