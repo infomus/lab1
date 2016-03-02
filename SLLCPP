@@ -1,0 +1,198 @@
+//Ask about negative input values
+
+#include "SequentialList.hpp"
+#include <iostream>
+#include <string>
+#include "Lab1Tests.hpp"
+using namespace std;
+
+SequentialList::SequentialList(unsigned int cap)
+{
+
+	data_ = new DataType [cap];
+	capacity_ = cap;
+	size_ = 0; 
+	
+}
+
+SequentialList::~SequentialList()
+{
+
+	delete [] data_;
+}
+
+bool SequentialList::empty() const
+{
+
+	if(size_ == 0)
+	return true;
+	else
+	return false;
+}
+
+unsigned int SequentialList::size() const
+{
+
+	return size_;
+}
+
+unsigned int SequentialList::capacity() const
+{
+
+	return capacity_;
+	
+}
+
+bool SequentialList::full() const
+{
+
+	if(capacity_ == size_)
+	{	
+		return true;
+	}
+	else
+	return false;
+	
+}
+
+void SequentialList::print() const
+{
+
+		if(size_ == 0)
+		return;
+		
+		for(int i = 0; i < size_; i = i + 1 )
+		{
+	
+			cout << data_[i] << ", ";
+		}
+		return;
+}
+
+bool SequentialList::insert_front(DataType val)
+{
+
+
+	if(capacity_ == 0)
+		return false;
+	
+	if(size_ == capacity_)
+	return false;
+	for(int i = size_;i > 0;i = i - 1)
+	{
+		data_[i] = data_[i-1];
+	}
+	data_[0] = val;
+	size_ = size_ + 1;
+	return true;
+		
+}
+
+bool SequentialList::remove_front()
+{ 
+
+	if(capacity_ == 0)
+		return false;
+	if(size_ == 0)
+		return false;
+	
+	for(int i = 1; i < size_; i =  i + 1)
+	{
+		data_[i-1] = data_[i];
+	}
+	
+	size_ = size_ - 1;
+	return true;
+		
+}
+
+bool SequentialList::insert_back(DataType val)
+{
+	
+
+
+	if(size_ == capacity_)
+	return false;
+	data_[size_] = val;
+	size_ = size_ + 1;
+	return true;
+}
+
+bool SequentialList::remove_back()
+{
+
+	if(size_ == 0)
+	return false;
+	else
+	{
+		size_ = size_ - 1;
+	}
+	return true;
+}
+//ask if insertion after size_ is allowed
+bool SequentialList::insert(DataType val, unsigned int index)
+{
+
+	if(size_ == capacity_)
+	return false;
+	if(index > size_)
+	return false;
+	
+	for(int i = size_; i > index ; i = i - 1 )
+	{
+		data_[i]=data_[i-1];
+	}
+	data_[index]=val;
+	size_ = size_ + 1;
+	return true;
+}
+
+bool SequentialList::remove(unsigned int index)
+{
+
+	if(size_ == 0)
+	return false;
+	if(index > size_ - 1)
+	return false;
+	for(int i = index; i < size_ - 1; i = i + 1)
+	{
+		data_[i] = data_[i+1];
+	}
+	size_ = size_ - 1;
+	return true;
+}
+
+unsigned int SequentialList::search(DataType val) const
+{
+
+	if(size_ == 0)
+	return 0;
+	for(int i = 0; i < size_; i = i + 1)
+	{
+		if(data_[i] == val)
+		{
+			return i;
+		}
+	}
+	return size_;
+}
+
+SequentialList::DataType SequentialList::select(unsigned int index) const
+{
+	if (size_ == 0) return -1;
+	if(index> size_ - 1)
+	return data_[size_ - 1];
+	
+	return data_[index];
+}
+
+bool SequentialList::replace(unsigned int index, DataType val)
+{
+
+	if(index < 0)
+	return false;
+	if(index > size_ - 1)
+	return false;
+	data_[index] = val;
+	return true;
+}
